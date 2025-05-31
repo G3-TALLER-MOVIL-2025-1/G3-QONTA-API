@@ -23,8 +23,8 @@ def home():
     print("Usando base de datos:", engine.url)
     return {'status': 'API funcionando'}
 
-if __name__ == '__main__':
-    with app.app_context():
-        # Crea las tablas si no existen en la base de datos (útil en Render)
-        Base.metadata.create_all(bind=engine)
-    app.run(debug=True)
+# app.py (fragmento final)
+with app.app_context():
+    Base.metadata.create_all(bind=engine)
+
+    #app.run(debug=True)
