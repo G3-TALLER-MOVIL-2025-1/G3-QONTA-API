@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean
 class AuditMixin:
     created = Column(DateTime, default=datetime.utcnow)
     creator = Column(Integer)
-    cahnged = Column(DateTime)
+    changed = Column(DateTime)
     changer = Column(Integer)
     isdeleted = Column(Boolean, default=False)
 
