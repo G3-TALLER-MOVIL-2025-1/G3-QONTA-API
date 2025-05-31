@@ -5,6 +5,7 @@ from flask_cors import CORS
 from models import *
 
 from routes.users import users_bp
+from routes.categories import categories_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -15,6 +16,7 @@ CORS(app)
 
 # Registrar rutas
 app.register_blueprint(users_bp, url_prefix='/api/users')
+app.register_blueprint(categories_bp, url_prefix='/api/categories')
 
 @app.route('/')
 def home():
