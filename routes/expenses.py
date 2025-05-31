@@ -50,14 +50,6 @@ def register():
     if not all(field in data for field in required_fields):
         return jsonify({'error': 'Faltan campos requeridos'}), 400
 
-    # Verificar si ya existe categoria
-    with SessionLocal() as session:
-        if session.query(Category).filter_by(categoriesid=data['categoryid']).first():
-            return jsonify({'error': 'El correo ya está registrado'}), 409
-
-    # Hashear la contraseña
-    # hashed_pw = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-
     # Crear nuevo usuario
     new_expense = Expense(
         userid=data['userid'],
