@@ -41,28 +41,29 @@ def get_all_expenses():
         })
 
     return jsonify(result), 200
+
 @expenses_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
 
-    # Validación básica
     required_fields = ['userid', 'categoryid', 'amount', 'description']
     if not all(field in data for field in required_fields):
         return jsonify({'error': 'Faltan campos requeridos'}), 400
 
-    # Crear nuevo usuario
     new_expense = Expense(
         userid=data['userid'],
         categoryid=data['categoryid'],
         amount=data['amount'],
-        description=data['description'],  # o usa el ID del admin si estás autenticando
+        description=data['description'],
     )
-    # with Session.begin() as session:
+
     with SessionLocal() as session:
         session.add(new_expense)
+        session.flush()  # Fuerza la generación de expensesid
+        expense_id = new_expense.expensesid  # Captura antes de cerrar sesión
         session.commit()
-    # db.session.add(new_user)
-    # db.session.commit()
 
-    return jsonify({'message': 'Gasto registrado correctamente', 'USERSID': new_expense.expensesid}), 201
-
+    return jsonify({
+        'message': 'Gasto registrado correctamente',
+        'EXPENSESID': expense_id
+    }), 201
