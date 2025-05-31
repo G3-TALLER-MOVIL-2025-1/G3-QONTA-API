@@ -4,7 +4,7 @@ from datetime import datetime
 class AuditMixin:
     CREATED = db.Column(db.DateTime, default=datetime.utcnow)
     CREATOR = db.Column(db.Integer)
-    CAHNGED = db.Column(db.DateTime)
+    CHANGED = db.Column(db.DateTime)
     CHANGER = db.Column(db.Integer)
     ISDELETED = db.Column(db.Boolean, default=False)
 
