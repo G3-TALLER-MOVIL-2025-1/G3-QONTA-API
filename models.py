@@ -1,32 +1,33 @@
-from db import db
+from db import Base
 from datetime import datetime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean, ForeignKey, Numeric, Text
 
 class AuditMixin:
-    CREATED = db.Column(db.DateTime, default=datetime.utcnow)
-    CREATOR = db.Column(db.Integer)
-    CHANGED = db.Column(db.DateTime)
-    CHANGER = db.Column(db.Integer)
-    ISDELETED = db.Column(db.Boolean, default=False)
+    created = Column(DateTime, default=datetime.utcnow)
+    creator = Column(Integer)
+    cahnged = Column(DateTime)
+    changer = Column(Integer)
+    isdeleted = Column(Boolean, default=False)
 
-class User(db.Model, AuditMixin):
-    __tablename__ = 'USERS'
-    USERSID = db.Column(db.Integer, primary_key=True)
-    EMAIL = db.Column(db.String(255), unique=True, nullable=False)
-    PASSWORDHASH = db.Column(db.Text, nullable=False)
-    NAME = db.Column(db.String(100), nullable=False)
-    LASTNAME = db.Column(db.String(100), nullable=False)
+class User(Base, AuditMixin):
+    __tablename__ = 'users'
+    usersid = Column(Integer, primary_key=True)
+    email = Column(String(255), unique=True, nullable=False)
+    passwordhash = Column(Text, nullable=False)
+    name = Column(String(100), nullable=False)
+    lastname = Column(String(100), nullable=False)
 
-class Category(db.Model, AuditMixin):
-    __tablename__ = 'CATEGORIES'
-    CATEGORIESID = db.Column(db.Integer, primary_key=True)
-    USERID = db.Column(db.Integer, db.ForeignKey('USERS.USERSID'), nullable=False)
-    CATEGORYNAME = db.Column(db.String(100), nullable=False)
-    ICON = db.Column(db.String(100))
+class Category(Base, AuditMixin):
+    __tablename__ = 'categories'
+    categoriesid = Column(Integer, primary_key=True)
+    userid = Column(Integer, ForeignKey('users.usersid'), nullable=False)
+    categoryname = Column(String(100), nullable=False)
+    icon = Column(String(100))
 
-class Expense(db.Model, AuditMixin):
-    __tablename__ = 'EXPENSESID'
-    EXPENSESID = db.Column(db.Integer, primary_key=True)
-    USERID = db.Column(db.Integer, db.ForeignKey('USERS.USERSID'), nullable=False)
-    CATEGORYID = db.Column(db.Integer, db.ForeignKey('CATEGORIES.CATEGORIESID'))
-    AMOUNT = db.Column(db.Numeric(10, 2), nullable=False)
-    DESCRIPTION = db.Column(db.Text)
+class Expense(Base, AuditMixin):
+    __tablename__ = 'expensesid'
+    expensesid = Column(Integer, primary_key=True)
+    userid = Column(Integer, ForeignKey('users.usersid'), nullable=False)
+    categoryid = Column(Integer, ForeignKey('categories.categoriesid'))
+    amount = Column(Numeric(10, 2), nullable=False)
+    description = Column(Text)
