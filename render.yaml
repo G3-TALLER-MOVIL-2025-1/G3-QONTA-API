@@ -1,12 +1,11 @@
 services:
   - type: web
-    name: qonta-api
+    name: flask-api
     env: python
     buildCommand: |
-      apt-get update
-      apt-get install -y tesseract-ocr
+      apt-get update && apt-get install -y tesseract-ocr
       pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
-      - key: TESSDATA_PREFIX
-        value: /usr/share/tesseract-ocr/5/tessdata
+      - key: PYTHON_VERSION
+        value: 3.10
