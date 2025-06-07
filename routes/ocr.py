@@ -3,6 +3,8 @@ from flask import Blueprint, request, jsonify
 from PIL import Image
 import pytesseract
 
+pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+
 ocr_bp = Blueprint('ocr', __name__)
 
 @ocr_bp.route('/scanImageForAmount', methods=['POST'])
