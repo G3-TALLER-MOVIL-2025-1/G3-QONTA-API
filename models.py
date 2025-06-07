@@ -22,7 +22,7 @@ class Category(Base, AuditMixin):
     categoriesid = Column(Integer, primary_key=True)
     userid = Column(Integer, ForeignKey('users.usersid'), nullable=False)
     categoryname = Column(String(100), nullable=False)
-    icon = Column(String(100))
+    color = Column(String(10))
 
 class Expense(Base, AuditMixin):
     __tablename__ = 'expensesid'

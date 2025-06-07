@@ -1,49 +1,38 @@
 from flask import Blueprint, request, jsonify
-from db import bcrypt, SessionLocal
+from db import SessionLocal
 from models import Expense, Category, User
 from datetime import datetime
-import json
-
 
 expenses_bp = Blueprint('expenses', __name__)
 
 @expenses_bp.route('/getAllExpenses', methods=['POST'])
-def get_all_expenses():
-    #users = User.query.filter_by(ISDELETED=False).all()
-    # result = []
-    # data = request.get_json()
-    # request_data = request.data
-    # request_data = json.loads(request_data.decode('utf-8'))
-    usersid = int(request.json['usersid'])
-    print(usersid)
-    print(type(usersid))
-    # if not data or 'usersid' not in data:
-    #     return jsonify({'error': 'Debe proporcionar el USERSID'}), 400
+def getAllExpenses():
+    data = request.get_json()
+
+    if not data or 'usersid' not in data:
+        return jsonify({'error': 'Debe proporcionar el usersid'}), 400
+
+    usersid = int(data['usersid'])
 
     with SessionLocal() as session:
-        expenses = session.query(Expense.amount, Category.categoryname, Expense.description).\
-        join(Category, Expense.categoryid==Category.categoriesid).join(User, Expense.userid==User.usersid).where(User.usersid==usersid).all()
-        # result.append((a, b, c))
+        expenses = session.query(
+            Expense.amount,
+            Category.categoryname,
+            Expense.description
+        ).join(Category, Expense.categoryid == Category.categoriesid
+        ).join(User, Expense.userid == User.usersid
+        ).filter(User.usersid == usersid).all()
 
-
-    result = []
-    # for expense in expenses:
-    #     result.append({
-    #         'amount': expenses.amount,
-    #         'categoryname': expenses.categoryname,
-    #         'description': expenses.description,
-    #     })
-    for expense in expenses:
-        result.append({
+        result = [{
             'amount': expense.amount,
-            'categoryname': expense.categoryname,
-            'description': expense.description,
-        })
+            'categoryName': expense.categoryname,
+            'description': expense.description
+        } for expense in expenses]
 
     return jsonify(result), 200
 
 @expenses_bp.route('/register', methods=['POST'])
-def register():
+def registerExpense():
     data = request.get_json()
 
     required_fields = ['userid', 'categoryid', 'amount', 'description']
@@ -55,15 +44,17 @@ def register():
         categoryid=data['categoryid'],
         amount=data['amount'],
         description=data['description'],
+        created=datetime.utcnow(),
+        creator=data['userid']
     )
 
     with SessionLocal() as session:
         session.add(new_expense)
-        session.flush()  # Fuerza la generación de expensesid
-        expense_id = new_expense.expensesid  # Captura antes de cerrar sesión
+        session.flush()  # Genera expensesid
+        expenseId = new_expense.expensesid
         session.commit()
 
     return jsonify({
         'message': 'Gasto registrado correctamente',
-        'EXPENSESID': expense_id
+        'expenseId': expenseId
     }), 201
