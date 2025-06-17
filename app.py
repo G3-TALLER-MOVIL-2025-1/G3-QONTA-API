@@ -31,4 +31,4 @@ def home():
 with app.app_context():
     Base.metadata.create_all(bind=engine)
 
-    app.run(debug=True)
+    #app.run(debug=True)
