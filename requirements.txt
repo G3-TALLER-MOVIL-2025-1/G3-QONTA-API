@@ -6,3 +6,6 @@ psycopg2-binary
 gunicorn
 tensorflow
 Pillow
+numpy
+scikit-learn
+joblib
