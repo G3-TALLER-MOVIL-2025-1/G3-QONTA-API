@@ -7,6 +7,7 @@ from routes.users import users_bp
 from routes.expenses import expenses_bp
 from routes.categories import categories_bp
 from routes.ocr import ocr_bp
+from routes.iot import iot_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -19,6 +20,7 @@ app.register_blueprint(users_bp, url_prefix='/api/users')
 app.register_blueprint(expenses_bp, url_prefix='/api/expenses')
 app.register_blueprint(categories_bp, url_prefix='/api/categories')
 app.register_blueprint(ocr_bp, url_prefix='/api/ocr')
+app.register_blueprint(iot_bp, url_prefix='/api/iot')
 
 @app.route('/')
 def home():
@@ -29,4 +31,4 @@ def home():
 with app.app_context():
     Base.metadata.create_all(bind=engine)
 
-    #app.run(debug=True)
+    app.run(debug=True)
