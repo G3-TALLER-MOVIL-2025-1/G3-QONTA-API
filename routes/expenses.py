@@ -7,28 +7,39 @@ expenses_bp = Blueprint('expenses', __name__)
 
 @expenses_bp.route('/getAllExpenses', methods=['POST'])
 def getAllExpenses():
-    data = request.get_json()
-
+    data = request.json['usersid']
     if not data or 'usersid' not in data:
-        return jsonify({'error': 'Debe proporcionar el usersid'}), 400
-
+        return jsonify({'error': 'Debe proporcionar el USERSID'}), 400
+    
     usersid = int(data['usersid'])
 
     with SessionLocal() as session:
         expenses = session.query(
             Expense.amount,
             Category.categoryname,
+            Expense.created,
             Expense.description
-        ).join(Category, Expense.categoryid == Category.categoriesid
-        ).join(User, Expense.userid == User.usersid
-        ).filter(User.usersid == usersid).all()
+        ).\
+        join(
+            Category,
+            Expense.categoryid==Category.categoriesid
+        ).join(
+            User,
+            Expense.userid==User.usersid
+        ).where(
+            User.usersid==usersid
+        ).all()
 
-        result = [{
+    result = []
+
+    for expense in expenses:
+        result.append({
             'amount': expense.amount,
-            'categoryName': expense.categoryname,
-            'description': expense.description
-        } for expense in expenses]
-
+            'categoryname': expense.categoryname,
+            'description': expense.description,
+            'date': str(expense.created)[0:10],
+        })
+    
     return jsonify(result), 200
 
 @expenses_bp.route('/register', methods=['POST'])
