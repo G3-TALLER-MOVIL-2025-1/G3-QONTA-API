@@ -7,7 +7,7 @@ expenses_bp = Blueprint('expenses', __name__)
 
 @expenses_bp.route('/getAllExpenses', methods=['POST'])
 def getAllExpenses():
-    data = request.json['usersid']
+    data = request.get_json()
     if not data or 'usersid' not in data:
         return jsonify({'error': 'Debe proporcionar el USERSID'}), 400
     
