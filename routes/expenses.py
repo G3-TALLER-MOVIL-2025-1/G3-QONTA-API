@@ -21,7 +21,7 @@ def get_all_expenses():
     #     return jsonify({'error': 'Debe proporcionar el USERSID'}), 400
 
     with SessionLocal() as session:
-        expenses = session.query(Expense.amount, Category.categoryname, Expense.description).\
+        expenses = session.query(Expense.amount, Category.categoryname, Expense.created, Expense.description).\
         join(Category, Expense.categoryid==Category.categoriesid).join(User, Expense.userid==User.usersid).where(User.usersid==usersid).all()
         # result.append((a, b, c))
 
@@ -33,12 +33,17 @@ def get_all_expenses():
     #         'categoryname': expenses.categoryname,
     #         'description': expenses.description,
     #     })
+    
     for expense in expenses:
         result.append({
             'amount': expense.amount,
             'categoryname': expense.categoryname,
             'description': expense.description,
+            'date': str(expense.created)[0:10],
         })
+        print(str(expense.created)[0:10])
+    
+
 
     return jsonify(result), 200
 @expenses_bp.route('/register', methods=['POST'])
@@ -74,3 +79,36 @@ def register():
 
     return jsonify({'message': 'Gasto registrado correctamente', 'USERSID': new_expense.expensesid}), 201
 
+@expenses_bp.route('/getProfileData', methods=['POST'])
+def get_profile_data():
+    data = request.get_json()
+    if not data or 'usersid' not in data:
+        return jsonify({'error': 'Debe proporcionar el USERSID'}), 400
+
+    with SessionLocal() as session:
+        user = session.query(User).filter_by(usersid=data['usersid'], isdeleted=False).first()
+        expenses = session.query(Expense).filter_by(userid=data['usersid'], isdeleted=False)
+
+    result = []
+    # for expense in expenses:
+    #     result.append({
+    #         'amount': expenses.amount,
+    #         'categoryname': expenses.categoryname,
+    #         'description': expenses.description,
+    #     })
+    for expense in expenses:
+        result.append({
+            'amount': expense.amount,
+            'created': expense.created,
+        })
+
+
+    # return jsonify(result[-1]), 200
+    # print(result[-1]["created"])
+    # print(result[-1]["amount"])
+    return jsonify([{
+        'email': user.email,
+        'fullname': f'{user.name} {user.lastname}',
+        'amount': result[-1]["amount"],
+        'date': str(result[-1]["created"])[0:10],
+    }]), 200
