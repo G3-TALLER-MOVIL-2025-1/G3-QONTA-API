@@ -4,6 +4,7 @@ from PIL import Image
 from flask import Blueprint, request, jsonify
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
+import pytesseract
 
 ocr_bp = Blueprint('ocr', __name__)
 
@@ -29,6 +30,26 @@ def scan_image_with_model():
         return jsonify({
             'message': 'Monto predicho con modelo',
             'amount': amount
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@ocr_bp.route('/scanImageWithOCR', methods=['POST'])
+def scan_image_with_ocr():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No se encontró la imagen en el request'}), 400
+
+    try:
+        image_file = request.files['image']
+        image = Image.open(image_file.stream).convert('RGB')  # Tesseract funciona mejor con RGB
+
+        # Extraer texto con pytesseract
+        text = pytesseract.image_to_string(image)
+
+        return jsonify({
+            'message': 'Texto extraído con OCR',
+            'text': text.strip()
         }), 200
 
     except Exception as e:
